@@ -22,7 +22,7 @@ export default function Home() {
   const [estimateValue, setEstimateValue] = useState('');
   const [estimateWithdrawValue, setEstimateWithdrawValue] = useState('');
   const [userAddress, setUserAddress] = useState('');
-  const [withdrawValue, setWithdrawValue] = useState(0);
+  const [withdrawValue, setWithdrawValue] = useState('');
   const [handleWithdrawLoader, setHandleWithdrawLoader] = useState(false);
   const [userWithdrawBalance, setUserWithdrawBalance] = useState(0);
   const [userValid, setUserValid] = useState(false);
@@ -264,12 +264,14 @@ export default function Home() {
           setUserValid(true);
           return res;
         }
-      });
+      });  let stribal = bal.data[2];
+      let  ans = stribal.split(":").pop();
       console.log('🚀 ~ bal ~ bal', bal);
+
       if (bal.data == 'Not Valid') {
         setUserWithdrawBalance(0);
       } else {
-        setUserWithdrawBalance(bal.data);
+        setUserWithdrawBalance(ans);
       }
     } catch (error) {
       console.log('🚀 ~ getUserWalletBalance ~ error', error);
@@ -449,7 +451,7 @@ export default function Home() {
     if (userWithdrawBalance == 'Not Valid') {
       return toast.error('Insufficient balance to withdraw!.');
     }
-   
+    setShow(false)
     setHandleWithdrawLoader(true);
 
     try {
@@ -470,14 +472,20 @@ export default function Home() {
       if (waitForTx) {
         setHandleWithdrawLoader(false);
          toast.success('Sucessfully Withdrawn Tokens!');
+
+         let formdata = new FormData();
+         formdata.append('address', userAddress);
+         formdata.append('amount', depositAmount);
+
          let withdraw = axios
           .post(
             `
-            https://greendotfinance.com/dashboard/b59c67bf196a4758191e42f76670cebaAPI/redeem.php?address=${userAddress}&amount=${withdrawValue}
-`
+            https://greendotfinance.com/dashboard/b59c67bf196a4758191e42f76670cebaAPI/redeem.php`,formdata
+
           )
           .then((res, err) => {
             if (res) {
+              
               getUserWalletBalance();
               return res;
             }
@@ -485,6 +493,7 @@ export default function Home() {
               console.log(err);
             }
           });
+          
       }
       
     } catch (error) {
@@ -613,6 +622,19 @@ export default function Home() {
 
       {/* withdraw  */}
       <div className='row m-0 p-0'>
+      <div className='col-md-4'>
+              <a href='/'>
+                <img
+                src='/assets/greendotfinlogo.png'
+                 // src='/assets/finswap.png'
+                  // className="img-fluid"
+                  alt='logo'
+                  loading='lazy'
+                  // height={150}
+                  className='myImg'
+                />
+              </a>
+            </div>
         <div className='col-md-12 d-flex justify-content-end '>
           {userAddress ? (
             <button
@@ -825,7 +847,7 @@ export default function Home() {
                             }}
                           >
                             (My Balance) - ({userWithdrawBalance}
-                            {' FTCCOIN'})
+                            {' POLKADOT'})
                           </p>
                         </div>
                       </div>
@@ -839,7 +861,7 @@ export default function Home() {
                        }}
                           >
                             {' '}
-                            Enter USD Amount
+                            Enter POLKADOT Amount
                           </label>
                           <input
                             style={{
@@ -851,15 +873,15 @@ export default function Home() {
                             }}
                             className='form-control '
                             type='text'
-                            placeholder='Enter Value'
+                            placeholder='Enter Polkaot Amount'
                             aria-label='default input example'
                             value={withdrawValue}
                             onChange={(e) => {
                               setWithdrawValue(e.target.value);
-                              _estimatedCreditValue(e.target.value);
+                            //  _estimatedCreditValue(e.target.value);
                             }}
                           />
-                            <p className='pt-2' style={{fontSize:'12px'}}>CREDIT : {estimateWithdrawValue ??'0'} FTC COIN</p>
+                            <p className='pt-2' style={{fontSize:'12px'}}>CREDIT : {withdrawValue} POLKADOT</p>
 
                         </div>
                       </div>
@@ -871,8 +893,8 @@ export default function Home() {
                           {!handleWithdrawLoader ? (
                             <button
                               className='btn btn-outline border-white text-white withdrawButton'
-                              onClick={handleWithdrawPOLKADOT}
-                              // onClick={handleShow}
+                             // onClick={handleWithdrawPOLKADOT}
+                               onClick={handleShow}
                             >
                               Withdraw
                             </button>
@@ -907,7 +929,7 @@ export default function Home() {
             ''
           )}
 
-          {/* <Modal show={show} onHide={handleClose}>
+           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>
                 <h4 className='text-dark'>Transaction </h4>
@@ -915,18 +937,18 @@ export default function Home() {
             </Modal.Header>
             <Modal.Body>
               <p className='text-dark'>Are you sure ?</p>
-              <p className='text-dark'>Withdraw Value {popUpwithdrawValue}</p>
-              <p className='text-dark'>Claim Value {popUpClaimValue} </p>
+              <p className='text-dark'>Withdraw Value {withdrawValue} POLKADOT</p>
+             {/* <p className='text-dark'>Claim Value {popUpClaimValue} </p>  */}
             </Modal.Body>
             <Modal.Footer>
               <Button variant='danger' onClick={handleClose}>
                 Reject
               </Button>
-              <Button variant='primary' onClick={handleWithdraw}>
+              <Button variant='primary' onClick={handleWithdrawPOLKADOT}>
                 Confirm
               </Button>
             </Modal.Footer>
-          </Modal> */}
+          </Modal> 
         </div>
       ) : (
         ''
