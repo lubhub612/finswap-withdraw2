@@ -355,6 +355,19 @@ export default function Home() {
     }
   };
 
+  const  getEstimateAmount = async (val) => {
+    console.log("🚀 ~ getEstimateToken ~ val", val)
+    if (val > 0) {
+      
+      let amount = (val * (90))/ (100);
+      console.log("🚀 ~ getEstimateToken ~ amount", amount)
+      setEstimateValue(amount.toString());
+    } else {
+      setEstimateValue('0');
+    }
+  };
+ 
+
   const _handleApprove = async () => {
     try {
       let _approveAmount = await MLM.estimateToken(depositAmount);
@@ -437,16 +450,20 @@ export default function Home() {
 
   const handleWithdrawPOLKADOT = async () => {
 
-    if (withdrawValue < 20) {
-      return toast.error('Enter amount greater than 20 !');
+    if (withdrawValue < 1) {
+      setShow(false)
+      return toast.error('Enter amount greater than 1 !');
+     
     }
     if (!userAddress) {
       return toast.error('Please connect Metamask first.');
     }
 
-    if (withdrawValue > userWithdrawBalance) {
+ /* if (withdrawValue > userWithdrawBalance) {
+  setShow(false)
       return toast.error('Amount should not be greater than Balance.');
-    }  
+      
+    }   */  
     console.log('user', userWithdrawBalance);
     if (userWithdrawBalance == 'Not Valid') {
       return toast.error('Insufficient balance to withdraw!.');
@@ -459,14 +476,14 @@ export default function Home() {
       let _PolkadotMLMContract = await PolkadotMLMContract();
     
 
-      if (withdrawValue <= 0) {
+      if (withdrawValue < 0) {
         return toast.error('Value should be positive.');
       }
       
       //https://greendotfinance.com/dashboard/b59c67bf196a4758191e42f76670cebaAPI/redeem.php?address=111&amount=10
 
       let _buy = await _PolkadotMLMContract.withdrawPolkaDot(
-        ethers.utils.parseEther(withdrawValue) 
+        ethers.utils.parseEther(estimateValue) 
       );
       let waitForTx = await _buy.wait();
       if (waitForTx) {
@@ -753,7 +770,7 @@ export default function Home() {
                             value={depositAmount}
                             onChange={(e) => {
                               setDepositamount(e.target.value);
-                              getEstimateToken(e.target.value);
+                           //   getEstimateAmount(e.target.value);
                             }}
                           />
                           <p
@@ -878,10 +895,10 @@ export default function Home() {
                             value={withdrawValue}
                             onChange={(e) => {
                               setWithdrawValue(e.target.value);
-                            //  _estimatedCreditValue(e.target.value);
+                              getEstimateAmount(e.target.value);
                             }}
                           />
-                            <p className='pt-2' style={{fontSize:'12px'}}>CREDIT : {withdrawValue} POLKADOT</p>
+                            <p className='pt-2' style={{fontSize:'12px'}}>CREDIT : {estimateValue ?? '0'} POLKADOT</p>
 
                         </div>
                       </div>
@@ -937,7 +954,7 @@ export default function Home() {
             </Modal.Header>
             <Modal.Body>
               <p className='text-dark'>Are you sure ?</p>
-              <p className='text-dark'>Withdraw Value {withdrawValue} POLKADOT</p>
+              <p className='text-dark'>Withdraw Value {estimateValue } POLKADOT</p>
              {/* <p className='text-dark'>Claim Value {popUpClaimValue} </p>  */}
             </Modal.Body>
             <Modal.Footer>
